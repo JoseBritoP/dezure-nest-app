@@ -35,16 +35,66 @@ export class ProductsService {
     return `This action returns all products`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number) {
+
+    const product = await this.productRepository.findOne({
+      where:{
+        id
+      },
+      select:{
+        creator:{
+          id:true,
+          username:true
+        }
+      }
+    });
+
+    if(!product) return new HttpException('Product not found',HttpStatus.NOT_FOUND);
+
+    return product
+
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
+  async update(id: number, updateProductDto: UpdateProductDto,user:UserType) {
     console.log(updateProductDto)
-    return `This action updates a #${id} product`;
+    const productToUpdate = await this.productRepository.findOne({
+      where:{
+        id
+      }
+    });
+
+    if(!productToUpdate) return new HttpException('Product not Found',HttpStatus.NOT_FOUND);
+
+    if(user.id === productToUpdate.creatorId) return new HttpException('Unauthorized',HttpStatus.UNAUTHORIZED);
+    
+    const productUpdated = await this.productRepository.save({
+      ...productToUpdate,
+      ...updateProductDto
+    });
+
+    return productUpdated
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number,user:UserType) {
+
+    const productToDelete = await this.productRepository.findOne({
+      where:{
+        id
+      }
+    });
+
+    if(!productToDelete) return new HttpException('Product not found',HttpStatus.NOT_FOUND);
+
+    const isOwnerOrAdmin = user.id === productToDelete.creatorId  || user.rol === 'admin';
+    if (!isOwnerOrAdmin) return new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+
+    await this.productRepository.delete(id);
+
+    return {
+      message: `The user #${id} was successfully deleted`,
+      productDeleted: productToDelete,
+    }
+
   }
 }
