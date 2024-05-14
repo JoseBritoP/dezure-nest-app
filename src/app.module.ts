@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ProductsModule } from './products/products.module';
+import { ManageProductsModule } from './manage-products/manage-products.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { ProductsModule } from './products/products.module';
       logging: false    
     }),
     UsersModule,
-    ProductsModule,
+    ManageProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService]

@@ -1,4 +1,4 @@
-import { Product } from 'src/products/entities/product.entity';
+import { Product } from 'src/manage-products/entities/product.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserGender {

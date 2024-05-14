@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { ProductsController } from './products.controller';
+import { ProductsService } from './manage-products.service';
+import { ManagerProductsController } from './manage-products.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { JwtModule } from '@nestjs/jwt';
@@ -14,7 +14,7 @@ import { UsersModule } from 'src/users/users.module';
     }),
     UsersModule
   ],
-  controllers: [ProductsController],
+  controllers: [ManagerProductsController],
   providers: [ProductsService],
 })
-export class ProductsModule {}
+export class ManageProductsModule {}
