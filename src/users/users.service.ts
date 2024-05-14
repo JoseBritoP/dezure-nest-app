@@ -103,10 +103,32 @@ export class UsersService {
     return user
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto);
-    return `This action updates a #${id} user`;
-  }
+  async update(id: number, authId:string, updateUserDto: UpdateUserDto) {
+    const userToUpdate = await this.userRepository.findOne({
+      where:{
+        id
+      },
+      select:{
+        id:true,
+        username:true,
+        email:true,
+        age:true,
+        gender:true
+      }
+    });
+    
+    if (!userToUpdate)  return new HttpException('User not found', HttpStatus.NOT_FOUND);
+    
+    if (userToUpdate.id !== +authId)  return new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    
+    // Actualizar y devolver el objeto
+    const userUpdated = await this.userRepository.save({
+        ...userToUpdate,
+        ...updateUserDto
+    });
+
+    return userUpdated;
+}
 
   remove(id: number) {
     return `This action removes a #${id} user`;
