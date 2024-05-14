@@ -1,35 +1,110 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { User } from './entities/user.entity';
+import { compare, hash } from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+// TODO: SR / MD
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private userRepository:Repository<User> ){}
-  
-  register(registerUserDto: RegisterUserDto) {
-    console.log(registerUserDto)
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User) 
+    private userRepository: Repository<User>,
+    private jwtService: JwtService
+  ) {}
+
+  async register(registerUserData: RegisterUserDto) {
+    const { password, username, email } = registerUserData;
+
+    const userExist = await this.userRepository.findOne({
+      where: [
+        {
+          username,
+        },
+        {
+          email,
+        },
+      ],
+    });
+
+    if (userExist) return new HttpException('User already exist', HttpStatus.CONFLICT);
+
+    const passwordHash = await hash(password, 8);
+    registerUserData = { ...registerUserData, password: passwordHash };
+
+    const user = this.userRepository.create(registerUserData);
+
+    return this.userRepository.save(user);
   }
 
-  login(loginUserDto:LoginUserDto){
-    console.log(loginUserDto);
-    return 'This actions login user'
+  async login(loginUserDto: LoginUserDto) {
+
+    const findUser = await this.userRepository.findOne({
+      where: {
+        email: loginUserDto.email,
+      },
+      select:{
+        id:true,
+        username:true,
+        email:true,
+        password:true,
+        rol:true
+      }
+    });
+
+    if (!findUser) return new HttpException('User not found',HttpStatus.NOT_FOUND);
+
+    const checkPassword = await compare(loginUserDto.password,findUser.password);
+
+    if(!checkPassword) return new HttpException('Password incorrect',HttpStatus.BAD_REQUEST);
+
+    const payload = {
+      id:findUser.id,
+      username:findUser.username,
+      email:findUser.email,
+      rol:findUser.rol
+    }
+
+    const token =  this.jwtService.sign(payload);
+
+    const data = {
+      token,
+      user:findUser
+    };
+
+    return data;
   }
 
   findAll() {
     return `This action returns all users`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+
+    const user = await this.userRepository.findOne({
+      where:{
+        id
+      },
+      select:{
+        id:true,
+        username:true,
+        email:true,
+        age:true,
+        gender:true
+      }
+    });
+
+    if(!user) return new HttpException('User not found',HttpStatus.NOT_FOUND);
+
+    return user
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto)
+    console.log(updateUserDto);
     return `This action updates a #${id} user`;
   }
 
