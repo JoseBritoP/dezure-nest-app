@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Product } from 'src/products/entities/product.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserGender {
   MALE = "male",
@@ -34,7 +35,8 @@ export class User {
   rol:UserRol
 
   @Column({ type: 'enum', enum:UserGender})
-
   gender: UserGender;
 
+  @OneToMany(()=>Product, product => product.creator)
+  products:Product[]
 }
