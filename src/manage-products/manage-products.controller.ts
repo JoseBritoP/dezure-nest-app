@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
-import { ProductsService } from './manage-products.service';
+import { ManageProductsService } from './manage-products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from 'src/users/jwt-auth.guard';
@@ -9,7 +9,7 @@ import { ReqUser } from 'src/types/payload';
 @ApiTags('Manage Products')
 @Controller('api/manage-products')
 export class ManagerProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ManageProductsService) {}
   @UseGuards(AuthGuard)
   @Post()
   create(@Body() createProductDto: CreateProductDto, @Request() req:ReqUser) {

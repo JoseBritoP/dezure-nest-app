@@ -9,7 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import { UserType } from 'src/types/payload';
 
 @Injectable()
-export class ProductsService {
+export class ManageProductsService {
   constructor(@InjectRepository(Product) 
     private productRepository:Repository<Product>,
     private usersService:UsersService

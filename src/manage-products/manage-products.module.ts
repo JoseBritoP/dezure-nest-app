@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ProductsService } from './manage-products.service';
+import { ManageProductsService } from './manage-products.service';
 import { ManagerProductsController } from './manage-products.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
@@ -15,6 +15,6 @@ import { UsersModule } from 'src/users/users.module';
     UsersModule
   ],
   controllers: [ManagerProductsController],
-  providers: [ProductsService],
+  providers: [ManageProductsService],
 })
 export class ManageProductsModule {}
