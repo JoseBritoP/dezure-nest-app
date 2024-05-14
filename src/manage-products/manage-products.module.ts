@@ -16,5 +16,6 @@ import { UsersModule } from 'src/users/users.module';
   ],
   controllers: [ManagerProductsController],
   providers: [ManageProductsService],
+  exports:[ManageProductsService]
 })
 export class ManageProductsModule {}
