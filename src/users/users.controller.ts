@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards,Request } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateAuthDto, UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from './jwt-auth.guard';
@@ -41,6 +41,14 @@ export class UsersController {
   update(@Param('id') id: string, @Request() req:ReqUser, @Body() updateUserDto: UpdateUserDto) {
     const authId = req.user.id
     return this.usersService.update(+id,authId, updateUserDto);
+  }
+
+  // UpdateCredentials
+  @UseGuards(AuthGuard)
+  @Patch('profile/credentials/:id')
+  changeAuth(@Param('id') id:string, @Request() req:ReqUser, @Body() updateAuthDto:UpdateAuthDto){
+    const authId = req.user.id
+    return this.usersService.updateCredentials(+id,authId,updateAuthDto)
   }
 
   // Delete

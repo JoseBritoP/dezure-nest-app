@@ -8,5 +8,5 @@ export type UserType = {
 }
 
 export type ReqUser = {
-  user:User
+  user:UserType
 }

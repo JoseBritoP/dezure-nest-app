@@ -2,13 +2,13 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateAuthDto, UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { User } from './entities/user.entity';
 import { compare, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserType } from 'src/types/payload';
-// TODO: SR / MD
+// TODO: SR / MD / NP
 
 @Injectable()
 export class UsersService {
@@ -139,6 +139,33 @@ export class UsersService {
 
     if (userToUpdate.id !== +authId)
       return new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+
+    // Actualizar y devolver el objeto
+    const userUpdated = await this.userRepository.save({
+      ...userToUpdate,
+      ...updateUserDto,
+    });
+
+    return userUpdated;
+  }
+
+  async updateCredentials(id: number, authId: number, updateUserDto: UpdateAuthDto) {
+    const userToUpdate = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        age: true,
+        gender: true,
+      },
+    });
+
+    if (!userToUpdate) return new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+    if (userToUpdate.id !== +authId) return new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
 
     // Actualizar y devolver el objeto
     const userUpdated = await this.userRepository.save({
