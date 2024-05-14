@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from './jwt-auth.guard';
+import { ReqUser } from 'src/types/payload';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -37,7 +38,7 @@ export class UsersController {
   // Update
   @UseGuards(AuthGuard)
   @Patch('profile/:id')
-  update(@Param('id') id: string, @Request() req, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: string, @Request() req:ReqUser, @Body() updateUserDto: UpdateUserDto) {
     const authId = req.user.id
     return this.usersService.update(+id,authId, updateUserDto);
   }
@@ -45,7 +46,8 @@ export class UsersController {
   // Delete
   @UseGuards(AuthGuard)
   @Delete('profile/:id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Param('id') id: string, @Request() req:ReqUser) {
+    const authUser = req.user
+    return this.usersService.remove(+id,authUser);
   }
 }

@@ -15,7 +15,6 @@ import { AppService } from './app.service';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       database: process.env.DB_NAME || 'nest-int',
       synchronize: true,
-      cache:true,
       logging: false    
     }),
     UsersModule,
