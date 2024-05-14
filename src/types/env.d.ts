@@ -5,7 +5,8 @@ export declare global {
       DB_PASSWORD:  string
       DB_HOST:      string
       DB_PORT:      number 
-      DB_NAME:  string
+      DB_NAME:      string
+      SECRET :      string
     }
   }
 }
