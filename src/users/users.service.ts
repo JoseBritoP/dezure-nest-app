@@ -85,8 +85,20 @@ export class UsersService {
     return data;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+   const users = await this.userRepository.find({
+    select:{
+      id:true,
+      username:true,
+      email:true,
+      age:true,
+      gender:true
+    }
+   });
+
+   if(!users.length) return new HttpException('Not found',HttpStatus.NOT_FOUND);
+
+   return users
   }
 
   async findOne(id: number) {
