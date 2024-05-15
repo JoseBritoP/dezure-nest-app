@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ApiTags } from '@nestjs/swagger';
+import { QueryValuesDto } from './products-filters.dto';
 
 @ApiTags('Products')
 @Controller('products')
@@ -9,26 +10,8 @@ export class ProductsController {
 
   @Get()
   findAll(
-    @Query('creatorId') creatorId?: number,
-    @Query('name') name?: string,
-    @Query('minPrice') minPrice?: number,
-    @Query('maxPrice') maxPrice?: number,
-    @Query('inStock') inStock?: string,
-    @Query('limit')   limit?:string,
-    @Query('page')    page?:string
+    @Query() queryValues:QueryValuesDto
   ) {
-
-    const filters = {
-      // creatorId,
-      // name,
-      // minPrice,
-      // maxPrice,
-      inStock
-    }
-    // console.log(filters)
-    // return this.productsService.findAll(filters);
-
-
-    return this.productsService.findAll(limit,page,filters);
+    return this.productsService.findAll(queryValues);
   }
 }
