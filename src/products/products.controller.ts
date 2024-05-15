@@ -9,26 +9,26 @@ export class ProductsController {
 
   @Get()
   findAll(
-    // @Query('creatorId') creatorId?: number,
-    // @Query('name') name?: string,
-    // @Query('minPrice') minPrice?: number,
-    // @Query('maxPrice') maxPrice?: number,
-    // @Query('inStock') inStock?: boolean,
+    @Query('creatorId') creatorId?: number,
+    @Query('name') name?: string,
+    @Query('minPrice') minPrice?: number,
+    @Query('maxPrice') maxPrice?: number,
+    @Query('inStock') inStock?: string,
     @Query('limit')   limit?:string,
     @Query('page')    page?:string
   ) {
 
-    // const filters = {
-    //   creatorId,
-    //   name,
-    //   minPrice,
-    //   maxPrice,
-    //   inStock
-    // }
+    const filters = {
+      // creatorId,
+      // name,
+      // minPrice,
+      // maxPrice,
+      inStock
+    }
     // console.log(filters)
     // return this.productsService.findAll(filters);
 
 
-    return this.productsService.findAll(limit,page);
+    return this.productsService.findAll(limit,page,filters);
   }
 }

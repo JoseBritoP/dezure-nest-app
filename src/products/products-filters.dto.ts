@@ -1,8 +1,8 @@
 
-export class ProductsFilters {
+export class ProductsFiltersDto {
   creatorId?: string;
   name?: string;
   minPrice?: string;
   maxPrice?: string;
-  inStock?: boolean;
+  inStock?: string;
 }

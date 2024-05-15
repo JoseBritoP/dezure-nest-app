@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/manage-products/entities/product.entity';
 import { Repository } from 'typeorm';
-// import { ProductsFilters } from './products-filters.dto';
+import { ProductsFiltersDto } from './products-filters.dto';
 
 @Injectable()
 export class ProductsService {
@@ -11,9 +11,10 @@ export class ProductsService {
   ){}
 
   
-  async findAll(limit:string,page:string){
+  async findAll(limit:string,page:string,filters:ProductsFiltersDto){
 
 
+    console.log(filters);
     const limitValue = Number(limit) <= 0 || limit === undefined || Number.isNaN(+limit) ? 5 : Number(limit);
     const pageValue =  Number(page)  <= 0 || page  === undefined || Number.isNaN(+page) ? 1 : Number(page);
     
