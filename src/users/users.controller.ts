@@ -3,12 +3,12 @@ import { UsersService } from './users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UpdateAuthDto, UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { AuthGuard } from './jwt-auth.guard';
 import { ReqUser } from 'src/types/payload';
 
 @ApiTags('Auth')
-@Controller('api/auth')
+@Controller('auth')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -36,6 +36,11 @@ export class UsersController {
   }
 
   // Update
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({
+    description:'Unauthorized Bearer Auth',
+    status:401
+  })
   @UseGuards(AuthGuard)
   @Patch('profile/:id')
   update(@Param('id') id: string, @Request() req:ReqUser, @Body() updateUserDto: UpdateUserDto) {
@@ -44,7 +49,12 @@ export class UsersController {
   }
 
   // UpdateCredentials
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
+  @ApiUnauthorizedResponse({
+    description:'Unauthorized Bearer Auth',
+    status:401
+  })
   @Patch('profile/credentials/:id')
   changeAuth(@Param('id') id:string, @Request() req:ReqUser, @Body() updateAuthDto:UpdateAuthDto){
     const authId = req.user.id
@@ -52,6 +62,11 @@ export class UsersController {
   }
 
   // Delete
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({
+    description:'Unauthorized Bearer Auth',
+    status:401
+  })
   @UseGuards(AuthGuard)
   @Delete('profile/:id')
   remove(@Param('id') id: string, @Request() req:ReqUser) {

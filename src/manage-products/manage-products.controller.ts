@@ -3,11 +3,16 @@ import { ManageProductsService } from './manage-products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from 'src/users/jwt-auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ReqUser } from 'src/types/payload';
 
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({
+  description:'Unauthorized Bearer Auth',
+  status:401
+})
 @ApiTags('Manage Products')
-@Controller('api/manage-products')
+@Controller('manage-products')
 export class ManagerProductsController {
   constructor(private readonly productsService: ManageProductsService) {}
   @UseGuards(AuthGuard)
