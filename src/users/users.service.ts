@@ -8,7 +8,6 @@ import { User } from './entities/user.entity';
 import { compare, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserType } from 'src/types/payload';
-// TODO: SR / MD / NP
 
 @Injectable()
 export class UsersService {
@@ -21,178 +20,123 @@ export class UsersService {
   async register(registerUserData: RegisterUserDto) {
     const { password, username, email } = registerUserData;
 
-    const userExist = await this.userRepository.findOne({
-      where: [
-        {
-          username,
-        },
-        {
-          email,
-        },
-      ],
-    });
-
-    if (userExist)
-      return new HttpException('User already exist', HttpStatus.CONFLICT);
+    await this.checkUserExistence(username, email);
 
     const passwordHash = await hash(password, 8);
-    registerUserData = { ...registerUserData, password: passwordHash };
+    registerUserData.password = passwordHash;
 
     const user = this.userRepository.create(registerUserData);
-
     return this.userRepository.save(user);
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const findUser = await this.userRepository.findOne({
-      where: {
-        email: loginUserDto.email,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        password: true,
-        rol: true,
-      },
-    });
+    const findUser = await this.findUserByEmail(loginUserDto.email, true);
 
-    if (!findUser)
-      return new HttpException('User not found', HttpStatus.NOT_FOUND);
+    await this.verifyPassword(loginUserDto.password, findUser.password);
 
-    const checkPassword = await compare(
-      loginUserDto.password,
-      findUser.password,
-    );
-
-    if (!checkPassword)
-      return new HttpException('Password incorrect', HttpStatus.BAD_REQUEST);
-
-    const payload = {
-      id: findUser.id,
-      username: findUser.username,
-      email: findUser.email,
-      rol: findUser.rol,
-    };
-
+    const payload = this.createPayload(findUser);
     const token = this.jwtService.sign(payload);
 
-    const data = {
-      token,
-      user: findUser,
-    };
-
-    return data;
+    return { token, user: findUser };
   }
 
   async findAll() {
-   const users = await this.userRepository.find({
-    select:{
-      id:true,
-      username:true,
-      email:true,
-      age:true,
-      gender:true
-    }
-   });
+    const users = await this.userRepository.find({
+      select: ['id', 'username', 'email', 'age', 'gender'],
+    });
 
-   if(!users.length) return new HttpException('Not found',HttpStatus.NOT_FOUND);
-
-   return users
+    if (!users.length) this.throwException('Not found', HttpStatus.NOT_FOUND);
+    return users;
   }
 
   async findOne(id: number) {
-    const user = await this.userRepository.findOne({
-      where: {
-        id,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        age: true,
-        gender: true,
-      },
-    });
-
-    if (!user) return new HttpException('User not found', HttpStatus.NOT_FOUND);
-
+    const user = await this.findUserById(id);
     return user;
   }
 
   async update(id: number, authId: number, updateUserDto: UpdateUserDto) {
-    const userToUpdate = await this.userRepository.findOne({
-      where: {
-        id,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        age: true,
-        gender: true,
-      },
-    });
+    const userToUpdate = await this.findUserById(id);
 
-    if (!userToUpdate)
-      return new HttpException('User not found', HttpStatus.NOT_FOUND);
+    this.checkOwnership(userToUpdate.id, authId);
 
-    if (userToUpdate.id !== +authId)
-      return new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-
-    // Actualizar y devolver el objeto
-    const userUpdated = await this.userRepository.save({
-      ...userToUpdate,
-      ...updateUserDto,
-    });
-
-    return userUpdated;
+    return this.userRepository.save({ ...userToUpdate, ...updateUserDto });
   }
 
   async updateCredentials(id: number, authId: number, updateUserDto: UpdateAuthDto) {
-    const userToUpdate = await this.userRepository.findOne({
-      where: {
-        id,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        age: true,
-        gender: true,
-      },
-    });
+    const userToUpdate = await this.findUserById(id);
 
-    if (!userToUpdate) return new HttpException('User not found', HttpStatus.NOT_FOUND);
+    this.checkOwnership(userToUpdate.id, authId);
 
-    if (userToUpdate.id !== +authId) return new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    await this.checkUserExistence(updateUserDto.username, updateUserDto.email);
 
-    // Actualizar y devolver el objeto
-    const userUpdated = await this.userRepository.save({
-      ...userToUpdate,
-      ...updateUserDto,
-    });
-
-    return userUpdated;
+    return this.userRepository.save({ ...userToUpdate, ...updateUserDto });
   }
 
   async remove(id: number, authUser: UserType) {
-    const userToDelete = await this.userRepository.findOne({
-      where: {
-        id,
-      },
-    });
+    const userToDelete = await this.findUserById(id);
 
-    if (!userToDelete) return new HttpException('User not found', HttpStatus.NOT_FOUND);
-
-    const isOwnerOrAdmin = authUser.id === id || authUser.rol === 'admin';
-
-    if (!isOwnerOrAdmin) return new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    this.checkAdminOrOwnership(authUser, id);
 
     await this.userRepository.delete(id);
     return {
       message: `The user #${id} was successfully deleted`,
       userDeleted: userToDelete,
     };
+  }
+
+  private async findUserById(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'username', 'email', 'age', 'gender'],
+    });
+
+    if (!user) this.throwException('User not found', HttpStatus.NOT_FOUND);
+    return user;
+  }
+
+  private async findUserByEmail(email: string, includePassword = false) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+      select: includePassword ? ['id', 'username', 'email', 'password', 'rol'] : ['id', 'username', 'email', 'rol'],
+    });
+
+    if (!user) this.throwException('User not found', HttpStatus.NOT_FOUND);
+    return user;
+  }
+
+  private async checkUserExistence(username?: string, email?: string) {
+    const userExist = await this.userRepository.findOne({
+      where: [{ username }, { email }],
+    });
+
+    if (userExist) this.throwException('User already exist', HttpStatus.CONFLICT);
+  }
+
+  private async verifyPassword(inputPassword: string, storedPassword: string) {
+    const isPasswordValid = await compare(inputPassword, storedPassword);
+
+    if (!isPasswordValid) this.throwException('Password incorrect', HttpStatus.BAD_REQUEST);
+  }
+
+  private checkOwnership(userId: number, authId: number) {
+    if (userId !== authId) this.throwException('Unauthorized', HttpStatus.UNAUTHORIZED);
+  }
+
+  private checkAdminOrOwnership(authUser: UserType, userId: number) {
+    const isOwnerOrAdmin = authUser.id === userId || authUser.rol === 'admin';
+    if (!isOwnerOrAdmin) this.throwException('Unauthorized', HttpStatus.UNAUTHORIZED);
+  }
+
+  private createPayload(user: User) {
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      rol: user.rol,
+    };
+  }
+
+  private throwException(message: string, status: HttpStatus) {
+    return new HttpException(message, status);
   }
 }
