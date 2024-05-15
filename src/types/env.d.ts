@@ -7,6 +7,7 @@ export declare global {
       DB_PORT:      number 
       DB_NAME:      string
       SECRET :      string
+      OPENAI_APIKEY:string
     }
   }
 }

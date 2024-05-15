@@ -40,8 +40,6 @@ Queremos conocerte mejor!!!
 
 Una oportunidad de que compartas eso que sabés hacer mejor. Programar. Que puedas a través de este ejercicio presentarte con tu trabajo y demostrar las ganas que tienes de ser parte. 
 
-
-
 - ¿Qué valoraremos? 
 
 Uso de node.js / Nest.js / Typescript 
@@ -49,8 +47,8 @@ Uso de middlewares, jwt.
 Uso de postgresql, models. Uso de relaciones y scopes. ORM. 
 Buenas prácticas: KISS, DRY, SOLID. Organización del código. Arquitectura de software 
 
-
 ## Consigna:
+
 1. Crear una API REST que comprenda las siguientes funcionalidades: 
 
 * Implementar autenticación utilizando JWT. 
@@ -59,8 +57,7 @@ Buenas prácticas: KISS, DRY, SOLID. Organización del código. Arquitectura de 
 * Un endpoint para listar todos los productos. Implementar paginación y filtros en el endpoint de listado de productos. 
 * Implementar manejo de errores y validación de datos en los endpoints. 
 * Implementar Swagger como herramienta para probar la funcionalidad de los endpoints y facilitar la documentación del proyecto
-
-## Agregar un endpoint para realizar consultas a ChatGPT mediante el uso de Langchain, su objetivo debe ser fruto de tu imaginación. 
+* Agregar un endpoint para realizar consultas a ChatGPT mediante el uso de Langchain, su objetivo debe ser fruto de tu imaginación. 
 
 
 2. Responder las siguientes preguntas y añadirlas al README como parte de la documentación: 
