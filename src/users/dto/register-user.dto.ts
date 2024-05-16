@@ -6,7 +6,7 @@ const passwordRegEx = /^(?=.*[0-9])(?=.*[A-Z]).{4,20}$/
 
 export class RegisterUserDto {
   @ApiProperty({
-    description:'Nombre de usuario',
+    description:'Your username',
     default:"Dezure",
     type:String
   })
@@ -16,7 +16,7 @@ export class RegisterUserDto {
   username: string;
 
   @ApiProperty({
-    description:'Correo',
+    description:'Your email',
     default:"dezure@gmail.com",
     type:String
   })
@@ -25,7 +25,7 @@ export class RegisterUserDto {
   email: string;
 
   @ApiProperty({
-    description:'Contraseña de registro',
+    description:'Your password',
     default:"Pass123!",
     type:String
   })
@@ -40,7 +40,7 @@ export class RegisterUserDto {
   password: string;
 
   @ApiProperty({
-    description:'Edad del usuario',
+    description:'The age of the user',
     default:22,
     type:Number
   })

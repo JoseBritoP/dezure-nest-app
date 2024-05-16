@@ -3,8 +3,10 @@ import { IsInt, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min, MinLength }
 
 export class CreateProductDto {
   @ApiProperty({
-    default:"Product Swagger",
-    description:"Nombre del producto"
+    default:"Swagger Product",
+    description:"Product's name",
+    type:String,
+    example:"Product Test"
   })
   @IsNotEmpty()
   @IsString()
@@ -14,7 +16,9 @@ export class CreateProductDto {
 
   @ApiProperty({
     default:24,
-    description:"Descripción breve del producto"
+    description:"Product's price",
+    example:30,
+    type:Number
   })
   @IsNotEmpty()
   @IsInt()
@@ -24,7 +28,9 @@ export class CreateProductDto {
   price:number
 
   @ApiProperty({
-    description:"El id del usuario al que le pertenece el producto"
+    type:Number,
+    description:"The creator/owner id of product",
+    example:4
   })
   @IsNotEmpty()
   @IsNumber()

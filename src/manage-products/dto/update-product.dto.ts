@@ -4,7 +4,8 @@ import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, MaxLength, MinLength 
 export class UpdateProductDto {
   @ApiPropertyOptional({
     default:"Product edit",
-    description:"Editar el nombre del producto"
+    description:"Set the new name of the product",
+    type:String
   })
   @IsOptional()
   @IsString()
@@ -14,7 +15,8 @@ export class UpdateProductDto {
 
   @ApiPropertyOptional({
     default:19,
-    description:"Editar el precio del producto"
+    description:"Set the new price of the product",
+    type:Number
   })
   @IsOptional()
   @IsInt()
@@ -23,7 +25,8 @@ export class UpdateProductDto {
 
   @ApiPropertyOptional({
     default:false,
-    description:"Editar la disponibilidad del producto"
+    description:"Set if the product is availability or not",
+    type:Boolean
   })
   @IsOptional()
   @IsBoolean()
