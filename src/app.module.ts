@@ -4,17 +4,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ManageProductsModule } from './manage-products/manage-products.module';
 import { ProductsModule } from './products/products.module';
 import { ChatModule } from './chat/chat.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
+    ConfigModule.forRoot(),TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 5432,
       password: process.env.DB_PASSWORD || '1234',
       username: process.env.DB_USERNAME || 'postgres',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      database: process.env.DB_NAME || 'nest-int',
+      database: process.env.DB_NAME || 'nest-db',
       synchronize: true,
       logging: false    
     }),

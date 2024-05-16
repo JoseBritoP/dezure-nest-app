@@ -22,6 +22,7 @@ export class AuthGuard implements CanActivate {
         token,
         {
           secret: process.env.SECRET || 'secret',
+          maxAge:'7d'
         }
       );
       request['user'] = payload;
