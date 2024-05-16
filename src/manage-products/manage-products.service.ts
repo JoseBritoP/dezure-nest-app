@@ -31,10 +31,6 @@ export class ManageProductsService {
 
   }
 
-  findAll() {
-    return `This action returns all products`;
-  }
-
   async findOne(id: number) {
 
     const product = await this.productRepository.findOne({

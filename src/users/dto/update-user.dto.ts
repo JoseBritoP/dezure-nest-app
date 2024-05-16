@@ -4,25 +4,42 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 const passwordRegEx = /^(?=.*[0-9])(?=.*[A-Z]).{4,20}$/
 
 export class UpdateUserDto {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description:"Update user's age",
+    default:24,
+    type:Number
+  })
   @IsOptional()
   @IsInt()
   age?: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    type:String,
+    description:"Update user's gender",
+    enum:["male","female","unspecified"],
+    default:"male"
+  })
   @IsOptional()
   @IsEnum(UserGender)
   gender?: UserGender;
 }
 
 export class UpdateAuthDto {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    type:String,
+    description:"Update username",
+    default:"DezureUPD"
+  })
   @IsOptional()
   @MinLength(3, { message: 'Username must have atleast 3 characters.' })
   @MaxLength(20,{ message: 'Username is too long' })
   username?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    type:String,
+    description:"Update email",
+    default:"dezureupd@gmail.com"
+  })
   @IsOptional()
   @IsEmail({}, { message: 'Please provide valid Email.' })
   email?: string;
@@ -30,8 +47,9 @@ export class UpdateAuthDto {
 
 export class UpdateAuthPasswordDto {
   @ApiProperty({
-    description:"Contraseña actual de la cuenta",
+    description:"Set current password",
     type:String,
+    example:"Pass123!",
   })
   @IsString()
   @MinLength(3)
@@ -39,8 +57,11 @@ export class UpdateAuthPasswordDto {
   currentPassword:string
 
   @ApiProperty({
-    description:"Nueva contraseña",
-    type:String
+    description:"Set new password",
+    type:String,
+    default:"",
+    required:true,
+    example:"NewPass123!"
   })
   @IsString()
   @MinLength(4)
@@ -55,8 +76,11 @@ export class UpdateAuthPasswordDto {
   newPassword:string
 
   @ApiProperty({
-    description:"Repetir nueva contraseña",
-    type:String
+    description:"Repeat your new password",
+    type:String,
+    default:"",
+    required:true,
+    example:"NewPass123!"
   })
   @IsString()
   @MinLength(4)

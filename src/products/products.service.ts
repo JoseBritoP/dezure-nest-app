@@ -6,7 +6,7 @@ import {
   Repository,
   SelectQueryBuilder,
 } from 'typeorm';
-import { QueryValuesDto } from './products-filters.dto';
+import { QueryValuesDto } from './dto/products-filters.dto';
 
 @Injectable()
 export class ProductsService {
@@ -67,16 +67,16 @@ export class ProductsService {
   private applyPriceFilters(queryBuilder: SelectQueryBuilder<Product>,minPrice: string,maxPrice: string): void {
     if (minPrice !== undefined && maxPrice !== undefined) {
       queryBuilder.andWhere('product.price BETWEEN :minPrice AND :maxPrice', {
-        minPrice: +minPrice,
-        maxPrice: +maxPrice,
+        minPrice: Math.floor(+minPrice),
+        maxPrice: Math.floor(+maxPrice),
       });
     } else if (minPrice !== undefined) {
       queryBuilder.andWhere('product.price >= :minPrice', {
-        minPrice: +minPrice,
+        minPrice: Math.floor(+minPrice),
       });
     } else if (maxPrice !== undefined) {
       queryBuilder.andWhere('product.price <= :maxPrice', {
-        maxPrice: +maxPrice,
+        maxPrice: Math.floor(+maxPrice),
       });
     }
   }
@@ -84,7 +84,7 @@ export class ProductsService {
   private applyCreatorIdFilter(queryBuilder: SelectQueryBuilder<Product>, creatorId: string): void {
     if (creatorId !== undefined) {
       queryBuilder.andWhere('product.creatorId = :creatorId', {
-        creatorId: +creatorId,
+        creatorId: Math.floor(Number(creatorId)),
       });
     }
   }
