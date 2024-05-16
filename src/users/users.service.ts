@@ -20,8 +20,9 @@ export class UsersService {
   async register(registerUserData: RegisterUserDto) {
     const { password, username, email } = registerUserData;
 
-    await this.checkUserExistence(username, email);
+    const checkUser = await this.checkUserExistence(username, email);
 
+    if(checkUser instanceof HttpException) return checkUser;
     const passwordHash = await hash(password, 8);
     registerUserData.password = passwordHash;
 
@@ -33,8 +34,9 @@ export class UsersService {
     const findUser = await this.findUserByEmail(loginUserDto.email, true);
     if(findUser instanceof HttpException) return findUser;
 
-    await this.verifyPassword(loginUserDto.password, findUser.password);
-
+    const check = await this.verifyPassword(loginUserDto.password, findUser.password);
+    if(check instanceof HttpException) return check;
+    
     const payload = this.createPayload(findUser);
     const token = this.jwtService.sign(payload);
 
