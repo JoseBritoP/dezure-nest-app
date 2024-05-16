@@ -16,7 +16,8 @@ export class ProductsController {
       currentPage:number
       totalItems:number
       data:Product[]
-    }
+    },
+    description:"Products"
   })
   @Get()
   @ApiQuery({ name: 'limit', required: false, description: 'Maximum number of results to return',type:Number })
