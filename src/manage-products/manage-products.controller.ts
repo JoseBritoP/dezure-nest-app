@@ -12,34 +12,26 @@ import { ReqUser } from 'src/types/payload';
   status:401
 })
 @ApiTags('Manage Products')
+@UseGuards(AuthGuard)
 @Controller('manage-products')
 export class ManagerProductsController {
   constructor(private readonly productsService: ManageProductsService) {}
-  @UseGuards(AuthGuard)
-  @Post()
+  @Post('create')
   create(@Body() createProductDto: CreateProductDto, @Request() req:ReqUser) {
     return this.productsService.create(createProductDto,req.user);
   }
 
-  @Get()
-  findAll() {
-    return this.productsService.findAll();
-  }
-
-  @UseGuards(AuthGuard)
-  @Get(':id')
+  @Get('get/:id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
   }
 
-  @UseGuards(AuthGuard)
-  @Patch(':id')
+  @Patch('update/:id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto,@Request() req:ReqUser) {
     return this.productsService.update(+id, updateProductDto,req.user);
   }
 
-  @UseGuards(AuthGuard)
-  @Delete(':id')
+  @Delete('delete/:id')
   remove(@Param('id') id: string, @Request() req:ReqUser) {
     return this.productsService.remove(+id,req.user);
   }
