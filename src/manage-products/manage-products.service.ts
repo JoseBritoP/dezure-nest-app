@@ -17,7 +17,7 @@ export class ManageProductsService {
 
   async create(createProductDto: CreateProductDto,user:UserType) {
 
-    const creator = await this.usersService.findOne(createProductDto.creatorId);
+    const creator = await this.usersService.getProfile(createProductDto.creatorId);
 
     // Si creator es una HttpException, significa que ocurrió un error al buscar al creador del producto
     if (creator instanceof HttpException) return creator
