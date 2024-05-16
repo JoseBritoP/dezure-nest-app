@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { UpdateAuthDto, UpdateUserDto } from './dto/update-user.dto';
+import { UpdateAuthDto, UpdateAuthPasswordDto, UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { User } from './entities/user.entity';
 import { compare, hash } from 'bcrypt';
@@ -31,6 +31,7 @@ export class UsersService {
 
   async login(loginUserDto: LoginUserDto) {
     const findUser = await this.findUserByEmail(loginUserDto.email, true);
+    if(findUser instanceof HttpException) return findUser;
 
     await this.verifyPassword(loginUserDto.password, findUser.password);
 
@@ -45,31 +46,62 @@ export class UsersService {
       select: ['id', 'username', 'email', 'age', 'gender'],
     });
 
-    if (!users.length) this.throwException('Not found', HttpStatus.NOT_FOUND);
+    if (!users.length) return new HttpException('Not found', HttpStatus.NOT_FOUND);
     return users;
   }
 
-  async findOne(id: number) {
+  async getProfile(id: number) {
     const user = await this.findUserById(id);
     return user;
   }
 
-  async update(id: number, authId: number, updateUserDto: UpdateUserDto) {
+  async updateProfileInfo(id: number, authId: number, updateUserDto: UpdateUserDto) {
     const userToUpdate = await this.findUserById(id);
+    if(userToUpdate instanceof HttpException) return userToUpdate;
 
     this.checkOwnership(userToUpdate.id, authId);
 
     return this.userRepository.save({ ...userToUpdate, ...updateUserDto });
   }
 
-  async updateCredentials(id: number, authId: number, updateUserDto: UpdateAuthDto) {
+  async updateAuthCredentials(id: number, authId: number, updateUserDto: UpdateAuthDto) {
     const userToUpdate = await this.findUserById(id);
-
+    if(userToUpdate instanceof HttpException ) return userToUpdate;
     this.checkOwnership(userToUpdate.id, authId);
 
-    await this.checkUserExistence(updateUserDto.username, updateUserDto.email);
+    const checkUser = await this.checkUserExistence(updateUserDto.username, updateUserDto.email);
+    if(checkUser instanceof HttpException) return checkUser;
 
-    return this.userRepository.save({ ...userToUpdate, ...updateUserDto });
+    userToUpdate.username = updateUserDto.username ? updateUserDto.username : userToUpdate.username 
+    userToUpdate.email = updateUserDto.email ? updateUserDto.email : userToUpdate.email
+
+    return this.userRepository.save(userToUpdate);
+  }
+
+  async updateAuthPassword(id:number,authId:number,updateAuthPasswordDto:UpdateAuthPasswordDto){
+    const user = await this.userRepository.findOne({
+      where:{
+        id
+      }
+    });
+
+    if(!user) return new HttpException('User not found',HttpStatus.NOT_FOUND)
+    if(user.id !== authId) return new HttpException('Unauthorized',HttpStatus.UNAUTHORIZED);
+
+    const passwordCheck = await this.verifyPassword(updateAuthPasswordDto.currentPassword, user.password);
+    
+    if(passwordCheck instanceof HttpException) return passwordCheck;
+
+    if(updateAuthPasswordDto.newPassword !== updateAuthPasswordDto.repeatPassword) return new HttpException('The password must match',HttpStatus.BAD_REQUEST);
+
+    const passwordHash = await hash(updateAuthPasswordDto.newPassword,8);
+    user.password = passwordHash
+
+    await this.userRepository.save(user);
+
+    return {
+      message:'The password was successfully updated!'
+    }
   }
 
   async remove(id: number, authUser: UserType) {
@@ -90,7 +122,7 @@ export class UsersService {
       select: ['id', 'username', 'email', 'age', 'gender'],
     });
 
-    if (!user) this.throwException('User not found', HttpStatus.NOT_FOUND);
+    if (!user) return new HttpException('User not found', HttpStatus.NOT_FOUND);
     return user;
   }
 
@@ -100,31 +132,31 @@ export class UsersService {
       select: includePassword ? ['id', 'username', 'email', 'password', 'rol'] : ['id', 'username', 'email', 'rol'],
     });
 
-    if (!user) this.throwException('User not found', HttpStatus.NOT_FOUND);
+    if (!user) return new HttpException('User not found', HttpStatus.NOT_FOUND);
     return user;
   }
 
-  private async checkUserExistence(username?: string, email?: string) {
+  private async checkUserExistence(username: string, email: string) {
     const userExist = await this.userRepository.findOne({
       where: [{ username }, { email }],
     });
 
-    if (userExist) this.throwException('User already exist', HttpStatus.CONFLICT);
+    if (userExist) return new HttpException('User already exist', HttpStatus.CONFLICT);
   }
 
   private async verifyPassword(inputPassword: string, storedPassword: string) {
     const isPasswordValid = await compare(inputPassword, storedPassword);
 
-    if (!isPasswordValid) this.throwException('Password incorrect', HttpStatus.BAD_REQUEST);
+    if (!isPasswordValid) return new HttpException('Password incorrect', HttpStatus.BAD_REQUEST);
   }
 
   private checkOwnership(userId: number, authId: number) {
-    if (userId !== authId) this.throwException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    if (userId !== authId) return new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
   }
 
   private checkAdminOrOwnership(authUser: UserType, userId: number) {
     const isOwnerOrAdmin = authUser.id === userId || authUser.rol === 'admin';
-    if (!isOwnerOrAdmin) this.throwException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    if (!isOwnerOrAdmin) return new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
   }
 
   private createPayload(user: User) {
@@ -136,7 +168,4 @@ export class UsersService {
     };
   }
 
-  private throwException(message: string, status: HttpStatus) {
-    return new HttpException(message, status);
-  }
 }

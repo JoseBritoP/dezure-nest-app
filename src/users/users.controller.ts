@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards,Request } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { UpdateAuthDto, UpdateUserDto } from './dto/update-user.dto';
+import { UpdateAuthDto, UpdateAuthPasswordDto, UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { AuthGuard } from './jwt-auth.guard';
@@ -32,7 +32,7 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('profile/:id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.getProfile(+id);
   }
 
   // Update
@@ -45,7 +45,7 @@ export class UsersController {
   @Patch('profile/:id')
   update(@Param('id') id: string, @Request() req:ReqUser, @Body() updateUserDto: UpdateUserDto) {
     const authId = req.user.id
-    return this.usersService.update(+id,authId, updateUserDto);
+    return this.usersService.updateProfileInfo(+id,authId, updateUserDto);
   }
 
   // UpdateCredentials
@@ -55,12 +55,24 @@ export class UsersController {
     description:'Unauthorized Bearer Auth',
     status:401
   })
-  @Patch('profile/credentials/:id')
-  changeAuth(@Param('id') id:string, @Request() req:ReqUser, @Body() updateAuthDto:UpdateAuthDto){
+  @Patch('credentials/:id')
+  updateAuth(@Param('id') id:string, @Request() req:ReqUser, @Body() updateAuthDto:UpdateAuthDto){
     const authId = req.user.id
-    return this.usersService.updateCredentials(+id,authId,updateAuthDto)
+    return this.usersService.updateAuthCredentials(+id,authId,updateAuthDto)
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @ApiUnauthorizedResponse({
+    description:'Unauthorized Bearer Auth',
+    status:401
+  })
+  @Patch('change-password/:id')
+  updatePassword(@Param('id') id:string,@Request() req:ReqUser,@Body() updatePassword:UpdateAuthPasswordDto){
+    return this.usersService.updateAuthPassword(+id,req.user.id,updatePassword)
+  }
+
+  @Patch('')
   // Delete
   @ApiBearerAuth()
   @ApiUnauthorizedResponse({
