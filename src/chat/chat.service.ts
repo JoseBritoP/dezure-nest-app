@@ -20,6 +20,8 @@ export class ChatService {
       console.log(error);
       return new HttpException(error.response, HttpStatus.CONFLICT);
     }
-    return 'This action adds a new chat';
+    return {
+      DIY:'This action adds a new chat'
+    };
   }
 }
