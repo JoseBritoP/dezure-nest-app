@@ -5,16 +5,16 @@ Para poner en marcha este proyecto, sigue estos pasos:
 
 * **Instalar dependencias**: Ejecuta el siguiente comando en la terminal para instalar todas las dependencias necesarias:
 
-   
-  ``npm install `` 
-
+````bash
+    npm install
+````
 
 * Crear un archivo .env teniendo en cuenta los ejemplos del archivo .env.example para su correcto funcionamiento en un entorno local
 * Ejecuta en la terminal el siguiente comando para iniciar el proyecto!
 
-  
-``npm run start:dev``
-
+````bash
+  npm run start:dev
+````
 
 
 * Visitando http://localhost:3000/docs verás la documentación de la API realizada con Swagger
