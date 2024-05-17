@@ -10,7 +10,7 @@ import { UserUtilsModule } from './utils/users-utils.module';
   imports:[TypeOrmModule.forFeature([User]),
   JwtModule.register({
     secret:process.env.SECRET || 'secret',
-    signOptions:{expiresIn:'180d'}
+    signOptions:{expiresIn:'7d'}
   }),
   UserUtilsModule],
   controllers: [UsersController],
