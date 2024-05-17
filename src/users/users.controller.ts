@@ -19,16 +19,19 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   // Auth
+  // Swagger
   @ApiResponse({
     status:201,
     type:User || HttpException,
     description:'Account created successfully',
   })
+  //? Register
   @Post('register')
    create(@Body() createUserDto: RegisterUserDto) {
-    return  this.usersService.register(createUserDto);
+    return  this.usersService.registerAccount(createUserDto);
   }
 
+  // Swagger
   @ApiResponse({
     status:201,
     description:'Account logged successfully',
@@ -38,9 +41,10 @@ export class UsersController {
     status:400,
     description:'Bad credentials'
   })
+  //? Login
   @Post('login')
   login(@Body() loginUserDto: LoginUserDto) {
-    return this.usersService.login(loginUserDto);
+    return this.usersService.loginAccount(loginUserDto);
   }
 
   @Get('users')
@@ -48,7 +52,8 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  // User
+  // Profile
+  // Swagger
   @ApiResponse({
     status:200,
     type:User,
@@ -60,12 +65,14 @@ export class UsersController {
     type:HttpException
   })
   @UseGuards(AuthGuard)
+  //? Profile
   @Get('profile/:id')
   findOne(@Param('id') id: string) {
     return this.usersService.getProfile(+id);
   }
 
   // Update
+  // Swagger
   @ApiBearerAuth()
   @ApiUnauthorizedResponse({
     description:'Unauthorized Bearer Auth',
@@ -82,6 +89,7 @@ export class UsersController {
     description:"Bad request - User not found"
   })
   @UseGuards(AuthGuard)
+  //? Profile Update
   @Patch('profile/:id')
   update(@Param('id') id: string, @Request() req:ReqUser, @Body() updateUserDto: UpdateUserDto) {
     const authId = req.user.id
@@ -89,6 +97,7 @@ export class UsersController {
   }
 
   // UpdateCredentials
+  // Swagger
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @ApiUnauthorizedResponse({
@@ -105,12 +114,14 @@ export class UsersController {
     type:HttpException,
     description:"Bad Request - User not found"
   })
+  //? Auth Credentials Update 
   @Patch('credentials/:id')
   updateAuth(@Param('id') id:string, @Request() req:ReqUser, @Body() updateAuthDto:UpdateAuthDto){
     const authId = req.user.id
     return this.usersService.updateAuthCredentials(+id,authId,updateAuthDto)
   }
 
+  // Swagger
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @ApiUnauthorizedResponse({
@@ -130,12 +141,14 @@ export class UsersController {
     type:HttpException,
     description:"Password incorrect - User not found"
   })
+  //? Auth - Password Update
   @Patch('change-password/:id')
   updatePassword(@Param('id') id:string,@Request() req:ReqUser,@Body() updatePassword:UpdateAuthPasswordDto){
     return this.usersService.updateAuthPassword(+id,req.user.id,updatePassword)
   }
 
   // Delete
+  // Swagger
   @ApiBearerAuth()
   @ApiUnauthorizedResponse({
     description:'Unauthorized Bearer Auth',
@@ -155,9 +168,10 @@ export class UsersController {
     type:HttpException
   })
   @UseGuards(AuthGuard)
+  //? Delete Profile
   @Delete('profile/:id')
   remove(@Param('id') id: string, @Request() req:ReqUser) {
     const authUser = req.user
-    return this.usersService.remove(+id,authUser);
+    return this.usersService.deleteProfile(+id,authUser);
   }
 }
