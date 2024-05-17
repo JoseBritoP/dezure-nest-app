@@ -1,5 +1,6 @@
 ## Iniciar proyecto
 
+- Recomendación: Crea tu cuenta, inicia sesión para obtener tu token de acceso a los demás endpoints!
 Para poner en marcha este proyecto, sigue estos pasos:
 
 * **Instalar dependencias**: Ejecuta el siguiente comando en la terminal para instalar todas las dependencias necesarias:
@@ -48,7 +49,7 @@ Buenas prácticas: KISS, DRY, SOLID. Organización del código. Arquitectura de 
 
 2. Responder las siguientes preguntas y añadirlas al README como parte de la documentación: 
 
-¿Qué es un middleware y cuál es su utilidad en una aplicación backend? 
+# ¿Qué es un middleware y cuál es su utilidad en una aplicación backend? 
 
 Un middleware es una función que se ejecuta entre la solicitud (request) del cliente y la respuesta (response) del controlador en una aplicación NestJS. En otras palabras, el middleware intercepta y puede manipular el objeto request antes de que llegue al controlador y puede modificar la respuesta antes de que se envíe de vuelta al cliente.
 
@@ -58,7 +59,7 @@ Los middlewares son útiles y suelen ser utilizados para realizar tareas comunes
 - Autenticación y Autorización: Comprobar que la solicitud incluye un token de acceso válido y que el usuario tiene los permisos necesarios para acceder al recurso solicitado.
 - Manejo de Errores: Capturar y manejar errores de manera centralizada antes de que lleguen a los controladores.
 
-¿Qué es SQL Injection y cómo puede evitarse? 
+# ¿Qué es SQL Injection y cómo puede evitarse? 
 
 SQL Injection es una técnica de ataque en la que un atacante inserta o "inyecta" código SQL malicioso en una consulta de base de datos a través de la entrada de un usuario. Este tipo de ataque puede permitir al atacante ejecutar comandos SQL arbitrarios, lo que puede llevar a la manipulación, divulgación o destrucción de datos sensibles en la base de datos.
 
@@ -75,7 +76,7 @@ Algunas formas en las que se puede evitar son :
   const user = await userRepository.findOne({ username: 'user_input' });
 
 ````
-2. Validación y sanatización de entradas: Validar y sanear todas las entradas del usuario para asegurar que contengan solo los datos esperados. Utilizar bibliotecas de validación como class-validator en NestJS, etc.
+3. Validación y sanatización de entradas: Validar y sanear todas las entradas del usuario para asegurar que contengan solo los datos esperados. Utilizar bibliotecas de validación como class-validator en NestJS, etc.
 ````bash
 import { IsString } from 'class-validator';
 
@@ -95,7 +96,7 @@ class UserInputDto {
 
 ````
 
-¿Cuándo es conveniente utilizar SQL Transactions? Dar un ejemplo. 
+# ¿Cuándo es conveniente utilizar SQL Transactions? Dar un ejemplo. 
 Una transacción SQL es una secuencia de operaciones que se ejecutan como una única unidad lógica de trabajo. Una transacción debe cumplir con las propiedades ACID: Atomicidad, Consistencia, Aislamiento y Durabilidad. Son convenientes cuando se necesitan asegurar la consistencia y la integridad de los datos en operaciones que involucran múltiples cambios en la base de datos. 
 
 Ejemplo en TypeORM y NestJS:
@@ -169,8 +170,7 @@ export class BankingService {
 - Se manejan los errores revirtiendo la transacción para asegurar que ninguna operación parcial quede aplicada.
 - Se libera el recurso, en este caso, el QueryRunner que manejó la transacción.
 
-Usando async/await: ¿cómo se puede aprovechar el paralelismo? 
-
+# Usando async/await: ¿cómo se puede aprovechar el paralelismo? 
 
 El paralelismo se puede aprovechar mediante el uso de Promise.all() o Promise.allSettled() para manejar múltiples tareas asincrónicas de forma simultánea que son independiente una de la otra.
 
