@@ -86,7 +86,6 @@ export class UsersService {
     return this.userRepository.save({ ...userToUpdate, username, email });
   }
   
-
   async updateAuthPassword(id: number, authId: number, updateAuthPasswordDto: UpdateAuthPasswordDto) {
     const user = await this.userRepository.findOne({
       where: { id },
@@ -114,8 +113,8 @@ export class UsersService {
   async deleteProfile(id: number, authUser: UserType) {
     const userToDelete = await this.userUtilsService.findUserById(id);
 
-    this.userUtilsService.checkAdminOrOwnership(authUser, id);
-
+    const check = this.userUtilsService.checkAdminOrOwnership(authUser, id);
+    if(check instanceof HttpException) return check;
     await this.userRepository.softDelete(id);
     return {
       message: `The user #${id} was successfully deleted`,
