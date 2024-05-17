@@ -15,9 +15,9 @@ import { ConfigModule } from '@nestjs/config';
       password: process.env.DB_PASSWORD || '1234',
       username: process.env.DB_USERNAME || 'postgres',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      database: process.env.DB_NAME || 'nest-db',
+      database: process.env.DB_NAME || 'nestdb',
       synchronize: true,
-      logging: false    
+      logging: false
     }),
     UsersModule,
     ManageProductsModule,
